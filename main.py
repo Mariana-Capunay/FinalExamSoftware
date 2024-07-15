@@ -3,6 +3,7 @@ from pydantic import BaseModel #to check the data type in a class
 from pydantic import Field #to give a default value to a field
 from typing import Optional, List #for optional data 
 from uuid import UUID, uuid4 # to generate hast
+import uvicorn
 
 app = FastAPI() 
 
@@ -44,3 +45,7 @@ def get_task_by_id(task_id: int):
         return {"message": "Task fetched successfully", "data": tasks[task_id].model_dump()}
     except:
         return {"message": "Task not found"}
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="127.0.0.1", port=8000)
