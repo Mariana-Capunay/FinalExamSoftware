@@ -1,4 +1,7 @@
 # FinalExamSoftware
+# Integrantes del grupo
+- Mariajulia Romina Romani Tafur
+- Mariana Aurora Capuñay Correa
 
 
 To run the program: 
@@ -25,6 +28,12 @@ To run the tests, execute:
 
     pytest
 
+
+## Rutas
+
+- /billetera/historial/minumero/{numero}
+- /billetera/contactos/minumero/{numero}
+- /billetera/pagar/minumero/{numero}/numerodestino/{destino}/valor/{valor}
 
 # Solution P3
 
