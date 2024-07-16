@@ -1,49 +1,51 @@
-from main import Task, create_task, get_tasks, get_task_by_id
+from main import CuentaUsuario, Operacion, BD, pagar
+
 import pytest
 
-
-def test_main():
-    response = get_tasks()
-    assert response["message"] == "Tasks fetched successfully"
-    assert response["data"] == []
-
 @pytest.mark.parametrize(
-    "task", #parameter value
+    "Usuario", #parameter value
     [
-            (Task(id=1, name="Task 1", description="This is task 1", completed=False, date="2021-09-01")),
-            (Task(id=2, name="Task 2", description="This is task 2", completed=True, date="2021-09-02"))
+        (CuentaUsuario(numero="21345", nombre="Arnaldo",saldo=200,NumerosContacto=["123","456"])),
+        (CuentaUsuario(numero="456", nombre="Andrea",saldo=300,NumerosContacto=["21345"])),
+        (CuentaUsuario(numero="123", nombre="Luisa",saldo=400,NumerosContacto=["456"]))
     ]
 )
-def test_add_task(task:Task):
-    response = create_task(task)
-    assert response["message"] == "Task created successfully"
-    """ 
-    // to be more specific
-    assert response["data"]["id"] == 1
-    assert response["data"]["name"] == "Task 1"
-    assert response["data"]["description"] == "This is task 1"
-    assert response["data"]["completed"] == False
-    assert response["data"]["date"] == "2021-09-01"
-    """
 
+
+# Caso de prueba: Validamos la creacion de un usuario
+def test_exists(Usuario:CuentaUsuario):
+    resp = [c for c in BD if c.numero == Usuario.numero]
+    assert len(resp) ==1
+
+@pytest.mark.parametrize(
+    "Usuario", #parameter value
+    [
+        (CuentaUsuario(numero="21345", nombre="Arnaldo",saldo=200,NumerosContacto=["123","456"])),
+        (CuentaUsuario(numero="123", nombre="Luisa",saldo=400,NumerosContacto=["456"]))
+    ]
+)
+
+# Caso de prueba: Valimos el listado de contactos
+def test_listarContactos(Usuario:CuentaUsuario):
+    resp = [c for c in BD if c.numero == Usuario.numero][0]
+    assert len(resp.NumerosContacto) == 1
+    
 
 
 @pytest.mark.parametrize(
-    "id", #parameter value
+    "Usuario,Destino,Valor", #parameter value
     [
-        (1)
+        (CuentaUsuario(numero="21345", nombre="Arnaldo",saldo=200,NumerosContacto=["123","456"]), CuentaUsuario(numero="456", nombre="Andrea",saldo=300,NumerosContacto=["21345"]), 5),
+        (CuentaUsuario(numero="21345", nombre="Arnaldo",saldo=200,NumerosContacto=["123","456"]), CuentaUsuario(numero="456", nombre="Andrea",saldo=300,NumerosContacto=["21345"]), 10)
     ]
 )
-def test_get_task_by_id(id:int):
-    response = get_task_by_id(id)
-    assert response["message"] == "Task fetched successfully"
-    """
-    assert response["data"]["name"] == "Task 1"
-    assert response["data"]["description"] == "This is task 1"
-    assert response["data"]["completed"] == False
-    assert response["data"]["date"] == "2021-09-01"
-    """
-   
 
-def test_exists_task():
-    assert get_task_by_id(1)["message"] == "Task fetched successfully"
+# Caso de prueba: Validamos la transferencia de dinero
+def test_transferir(Usuario:CuentaUsuario, Destino:CuentaUsuario, Valor:int):
+
+    assert Usuario.transferir(Destino, Valor) == True
+
+    # Caso de error: El saldo restante no cumple con el valor de la transferencia
+    assert Usuario.saldo == 195
+    # Caso de error: El saldo restante no cumple con el valor de la transferencia
+    assert Destino.saldo == 305
